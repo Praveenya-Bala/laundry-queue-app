@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = "https://laundry-queue-app.onrender.com";
 
 export const fetchWithAuth = (url, options = {}) => {
   const token = localStorage.getItem("token");
