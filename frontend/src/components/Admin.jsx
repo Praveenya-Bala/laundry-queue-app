@@ -6,58 +6,87 @@ const Admin = () => {
   const [machines, setMachines] = useState([]);
   const [name, setName] = useState("");
 
-  /* Fetch machines */
+  // Fetch all machines
   const fetchMachines = async () => {
-    const res = await fetchWithAuth("/queue");
-    const data = await res.json();
-    setMachines(data);
+    try {
+      const res = await fetchWithAuth("/api/machines"); // Correct API path
+      if (!res.ok) throw new Error("Failed to fetch machines");
+
+      const data = await res.json();
+      setMachines(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching machines:", err);
+      setMachines([]);
+    }
   };
 
   useEffect(() => {
     fetchMachines();
   }, []);
 
-  /* Add machine */
+  // Add a new machine
   const handleAdd = async () => {
     if (!name.trim()) return;
 
-    await fetchWithAuth("/machines/add", {
-      method: "POST",
-      body: JSON.stringify({ name }),
-    });
+    try {
+      const res = await fetchWithAuth("/api/machines/add", {
+        method: "POST",
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to add machine");
 
-    setName("");
-    fetchMachines();
+      setMachines((prev) => [...prev, data]);
+      setName("");
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  /* Remove machine */
+  // Remove machine
   const handleRemove = async (id) => {
-    await fetchWithAuth(`/machines/${id}`, {
-      method: "DELETE",
-    });
+    if (!window.confirm("Are you sure you want to remove this machine?")) return;
 
-    fetchMachines();
+    try {
+      const res = await fetchWithAuth(`/api/machines/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to remove machine");
+
+      setMachines((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  /* Maintenance */
+  // Set maintenance
   const setMaintenance = async (id) => {
-    const res = await fetchWithAuth(`/machines/${id}/maintenance`, {
-      method: "PUT",
-    });
+    try {
+      const res = await fetchWithAuth(`/api/machines/${id}/maintenance`, { method: "PUT" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to set maintenance");
 
-    const data = await res.json();
-    alert(data.message);
-
-    fetchMachines();
+      setMachines((prev) =>
+        prev.map((m) => (m._id === id ? { ...m, status: "maintenance" } : m))
+      );
+      alert(data.message);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  /* Enable */
+  // Enable machine
   const enableMachine = async (id) => {
-    await fetchWithAuth(`/machines/${id}/enable`, {
-      method: "PUT",
-    });
+    try {
+      const res = await fetchWithAuth(`/api/machines/${id}/enable`, { method: "PUT" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to enable machine");
 
-    fetchMachines();
+      setMachines((prev) =>
+        prev.map((m) => (m._id === id ? { ...m, status: "available" } : m))
+      );
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -65,9 +94,10 @@ const Admin = () => {
       <Navbar />
       <div className="admin-container">
         <h2 className="admin-title">Admin Dashboard 🤵</h2>
-        <hr /><br />
+        <hr />
+        <br />
 
-        {/* ADD MACHINE */}
+        {/* Add Machine */}
         <div className="admin-add">
           <input
             className="admin-input"
@@ -76,72 +106,61 @@ const Admin = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-
           <button className="admin-add-btn" onClick={handleAdd}>
             Add Machine
           </button>
         </div>
 
-        {/* MACHINE TABLE */}
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Current User</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {machines.map((m) => (
-              <tr key={m._id}>
-                <td>{m.name}</td>
-
-                <td>
-                  <span className={`status-${m.status}`}>
-                    {m.status}
-                  </span>
-                </td>
-
-                <td>
-                  {m.currentUser ? m.currentUser.username : "—"}
-                </td>
-
-                <td className="action-group">
-                  {m.status !== "maintenance" ? (
-                    <button
-                      className="btn btn-maintenance"
-                      onClick={() => setMaintenance(m._id)}
-                    >
-                      Maintenance
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-enable"
-                      onClick={() => enableMachine(m._id)}
-                    >
-                      Enable
-                    </button>
-                  )}
-
-                  <button
-                    className="btn btn-remove"
-                    onClick={() => handleRemove(m._id)}
-                  >
-                    Remove
-                  </button>
-                </td>
+        {/* Machine Table */}
+        <div className="table-wrapper" style={{ overflowX: "auto" }}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Current User</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <h3>Machine Queues 📋</h3>
+            </thead>
+            <tbody>
+              {machines.map((m) => (
+                <tr key={m._id}>
+                  <td>{m.name}</td>
+                  <td>
+                    <span className={`status-${m.status}`}>{m.status}</span>
+                  </td>
+                  <td>{m.currentUser ? m.currentUser.username : "—"}</td>
+                  <td className="action-group">
+                    {m.status !== "maintenance" ? (
+                      <button
+                        className="btn btn-maintenance"
+                        onClick={() => setMaintenance(m._id)}
+                      >
+                        Maintenance
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-enable"
+                        onClick={() => enableMachine(m._id)}
+                      >
+                        Enable
+                      </button>
+                    )}
+                    <button className="btn btn-remove" onClick={() => handleRemove(m._id)}>
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
+        {/* Machine Queues */}
+        <h3>Machine Queues 📋</h3>
         {machines.map((m) => (
           <div key={m._id} className="queue-box">
             <h4>{m.name}</h4>
-
             {m.queue && m.queue.length > 0 ? (
               <ul>
                 {m.queue.map((user, index) => (

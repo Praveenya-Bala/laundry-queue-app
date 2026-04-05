@@ -405,10 +405,13 @@ li {
 .admin-add {
   margin-bottom: 20px;
   display: flex;
+  flex-wrap: wrap; /* allow input + button to wrap on small screens */
   gap: 10px;
 }
 
 .admin-input {
+  flex: 1;
+  min-width: 150px;
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
@@ -428,11 +431,19 @@ li {
   background: darkgreen;
 }
 
+/* Table wrapper for mobile scrolling */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 /* Table */
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-width: 600px; /* ensures table looks good on desktop */
 }
 
 .admin-table thead {
@@ -444,6 +455,38 @@ li {
 .admin-table td {
   padding: 10px;
   text-align: center;
+  font-size: 14px;
+}
+
+/* Buttons in table smaller on mobile */
+.action-group button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Queue box below table */
+.queue-box {
+  margin-bottom: 15px;
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Media query for small screens */
+@media (max-width: 600px) {
+  .admin-table th,
+  .admin-table td {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .admin-add {
+    flex-direction: column;
+  }
+
+  .admin-input {
+    width: 100%;
+  }
 }
 
 /* Status */
@@ -508,10 +551,8 @@ li {
   padding: 0 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
-/* LEFT */
-.nav-left h3 {
-  margin: 0;
+.navbar h3{
+  padding-left: 130px;
 }
 
 /* RIGHT */
@@ -650,4 +691,69 @@ li {
   .machines-title {
     font-size: 20px;
   }
+}
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #4f6ef7; /* nice blue */
+  color: #fff;
+  padding: 10px 20px;
+  font-family: Arial, sans-serif;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-user {
+  margin-right: 10px;
+}
+
+.nav-role {
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: orange;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.logout-btn {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  background: red;
+  color: #fff;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: darkred;
+}
+
+/* Back button styling */
+.back-btn {
+  padding: 5px 10px;
+  margin-right: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
 }

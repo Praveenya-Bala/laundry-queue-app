@@ -18,62 +18,50 @@ function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!role) {
-      alert("Please select a role");
-      return;
+  if (!role) {
+    alert("Please select a role");
+    return;
+  }
+
+  try {
+    const res = await loginUser({ username, password });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Login failed");
     }
 
-    try {
-      const res = await loginUser({ username, password });
-      const data = await res.json();
-
-      // ❌ Error from backend
-      if (!res.ok) {
-        alert(data.message);
-
-        if (data.message === "User not found") {
-          navigate("/signup");
-        }
-
-        resetForm();
-        return;
-      }
-
-      // 🔒 ROLE CHECK
-      if (role === "admin" && data.user.role !== "admin") {
-        alert("Access denied: Not an admin");
-        resetForm();
-        return;
-      }
-
-      if (role === "user" && data.user.role !== "user") {
-        alert("Please login as admin");
-        resetForm();
-        return;
-      }
-
-      // ✅ SAVE AUTH
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token);
-
-      setUser(data.user);
-
-      // 🚀 REDIRECT
-      if (data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/machines");
-      }
-
-      resetForm();
-
-    } catch (err) {
-      console.error("Login failed:", err);
-      alert("Something went wrong");
+    // 🔒 ROLE CHECK
+    if (role === "admin" && data.user.role !== "admin") {
+      throw new Error("Access denied: Not an admin");
     }
-  };
+
+    if (role === "user" && data.user.role !== "user") {
+      throw new Error("Please login as admin");
+    }
+
+    // ✅ SAVE AUTH
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("token", data.token);
+
+    setUser(data.user);
+
+    // 🚀 REDIRECT
+    if (data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/machines");
+    }
+
+    resetForm();
+
+  } catch (err) {
+    console.error("Login failed:", err);
+    alert(err.message || "Something went wrong"); // ✅ important
+  }
+};
 
   return (
     <div className="auth-container">
