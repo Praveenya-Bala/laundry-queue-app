@@ -13,18 +13,18 @@ export const fetchWithAuth = (url, options = {}) => {
   });
 };
 
-// LOGIN
+// ✅ LOGIN (FIXED)
 export const loginUser = (userData) => {
-  return fetch(`${BASE_URL}/users/login`, {
+  return fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData)
   });
 };
 
-// SIGNUP
+// ✅ SIGNUP (FIXED)
 export const signupUser = (userData) => {
-  return fetch(`${BASE_URL}/users/signup`, {
+  return fetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData)
