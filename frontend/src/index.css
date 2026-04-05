@@ -19,7 +19,8 @@
 .auth-box {
   background: #ffffff;
   padding: 35px 40px;
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
@@ -597,4 +598,56 @@ li {
 .queue-box p {
   color: #888;
   font-size: 14px;
+}
+
+/* ================= MOBILE FIX ================= */
+@media (max-width: 768px) {
+
+  /* Auth box full width */
+  .auth-box {
+    width: 90%;
+    padding: 20px;
+  }
+
+  /* Machine grid → single column */
+  .machine-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Reduce padding */
+  .machines-wrapper {
+    padding: 20px 10px;
+  }
+
+  /* Navbar adjust */
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  /* Admin add section stack */
+  .admin-add {
+    flex-direction: column;
+  }
+
+  /* Buttons full width */
+  .start-btn,
+  .finish-btn,
+  .cancel-btn,
+  .join-btn,
+  .leave-btn {
+    width: 100%;
+  }
+
+  /* Queue card full width */
+  .queue-card {
+    width: 95%;
+  }
+
+  /* Reduce title size */
+  .machines-title {
+    font-size: 20px;
+  }
 }
