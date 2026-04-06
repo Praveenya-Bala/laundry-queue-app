@@ -23,7 +23,7 @@ export const loginUser = (userData) => {
 
 // Corrected SIGNUP
 export const signupUser = (userData) => {
-  return fetch(`${BASE_URL}/api/users/register`, { // 🔹 changed /auth/register → /users/register
+  return fetch(`${BASE_URL}/api/users/signup`, { // 🔹 changed /auth/register → /users/register
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
